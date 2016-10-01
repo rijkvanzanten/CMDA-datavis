@@ -1,0 +1,27 @@
+html {
+  background-color: #000000;
+  overflow: hidden;
+}
+
+svg {
+  position: absolute;
+  z-index: -1;
+  transform-style: preserve-3d;
+  transform: rotate(180deg);
+  transition: transform 0.5s;
+}
+
+svg, svg path, svg line, svg g {
+  transform-origin: center;
+}
+
+path {
+  fill: #f88e22;
+  stroke: #fff;
+  stroke-width: 2px;
+  opacity: 0.4;
+}
+
+.hexagon {
+  stroke-width: 0;
+}
