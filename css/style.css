@@ -14,10 +14,8 @@ svg, svg path, svg line, svg g {
 }
 
 path {
-  fill: #f88e22;
   stroke: #fff;
   stroke-width: 2px;
-  opacity: 0.4;
 }
 
 .hexagon {
