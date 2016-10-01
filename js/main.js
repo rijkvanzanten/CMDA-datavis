@@ -1,5 +1,4 @@
 let waveform_array = [];
-let analyser;
 
 const state = {
   width: window.innerWidth,
@@ -11,15 +10,10 @@ const state = {
 // Web Audio API Context
 const context = new (window.AudioContext || window.webkitAudioContext)();
 
-// Get Audio file
-const request = new XMLHttpRequest();
-request.open('GET', 'mp3/keyboard2.mp3', true);
-request.responseType = 'arraybuffer';
-request.onload = function(event) {
-  const data = event.target.response;
-  audioBullshit(data);
-}
-request.send();
+// Play audio
+const audio = new Audio();
+audio.src = '/mp3/keyboard.mp3';
+audio.autoplay = true;
 
 // Main SVG element
 const svg = d3.select("body").append("svg")
@@ -34,34 +28,25 @@ const color = d3.scale.linear()
   .interpolate(d3.interpolateLab);
 
 // Create d3 randomizer function (normilized)
-const randomX = d3.random.normal(state.width / 2, 700);
+// Creates numbers with a normal distribution > http://www.hbostatistiek.nl/wp-content/uploads/2014/07/normale-verdeling-klokvorm.png
+const randomX = d3.random.normal(state.width / 2, (state.width / 2) - 250);
 
 const randumNums = d3.range(1024).map(function() { return randomX(); });
 
 const hexbin = d3.hexbin()
   .size([state.width, state.height])
-  .radius(50);
+  .radius(state.height / 9);
 
 const radius = d3.scale.linear()
   .domain([0, 20])
   .range([0, 130]);
 
-/**
- * Setup analyser and source buffers for audio file
- * @param  {arraybuffer} buffer from audio file
- */
-function audioBullshit(data) {
-  analyser = context.createAnalyser();
-  const source = context.createBufferSource();
-  source.buffer = context.createBuffer(data, false);
-  source.loop = true;
-  source.noteOn(0);
+const analyser = context.createAnalyser();
+const source = context.createMediaElementSource(audio);
+source.connect(analyser);
+analyser.connect(context.destination);
 
-  source.connect(analyser);
-  analyser.connect(context.destination);
-
-  frameLooper();
-}
+frameLooper();
 
 /**
  * 24fps capped rendering loop
@@ -102,29 +87,21 @@ function render() {
 	    .style("opacity", function(d) { return 0.8-(radius(d.length)/180); });
 }
 
-/**
- * Normalize waveform array
- * @param  {int} coef
- * @param  {int} offset
- * @param  {bool} neg
- * @return {array}
- */
-function normalize(coef, offset, neg) {
-	var coef = coef || 1;
-	var offset = offset || 0;
-	var numbers = waveform_array;
-	var numbers2 = [];
-	var ratio = Math.max.apply( Math, numbers );
-	var l = numbers.length
+function normalize(coef = 1, offset = 0, neg) {
+	const numbers = waveform_array;
+	const numbers2 = [];
+	const ratio = Math.max.apply(Math, numbers);
 
-	for (var i = 0; i < l; i++ ) {
-		if (numbers[i] == 0)
-			numbers2[i] = 0 + offset;
-		else
-			numbers2[i] = ((numbers[i]/ratio) * coef) + offset;
+	for (let i = 0; i < numbers.length; i++ ) {
+		if (numbers[i] == 0) {
+      numbers2[i] = 0 + offset;
+    } else {
+      numbers2[i] = ((numbers[i]/ratio) * coef) + offset;
+    }
 
-		if (i%2 == 0 && neg)
-			numbers2[i] = -Math.abs(numbers2[i]);
+		if (i%2 == 0 && neg) {
+      numbers2[i] = -Math.abs(numbers2[i]);
+    }
 	}
 	return numbers2;
 }
