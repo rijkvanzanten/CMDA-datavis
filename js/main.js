@@ -14,6 +14,7 @@ const context = new (window.AudioContext || window.webkitAudioContext)();
 const audio = new Audio();
 audio.src = '/mp3/keyboard.mp3';
 audio.autoplay = true;
+audio.loop = true;
 
 // Main SVG element
 const svg = d3.select("body").append("svg")
