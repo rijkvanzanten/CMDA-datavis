@@ -72,9 +72,10 @@ function frameLooper() {
  * Render audio data with d3
  */
 function render() {
-  $('body > svg').empty();
+  const vizualisation = document.getElementById('viz');
+  while(vizualisation.firstChild) vizualisation.removeChild(vizualisation.firstChild);
 
-  const points = d3.zip(randumNums, normalize(state.height, 0));
+  const points = d3.zip(randumNums, normalize(state.height, 0, true));
 
 	svg.append("g")
 	  .selectAll(".hexagon")
