@@ -78,6 +78,48 @@ gradient.select('stop')
 svg.append('g')
   .attr('id', 'keystrokes');
 
+d3.csv('../data/keyfreq.txt', (json) => {
+  data = json.map((d) => {
+    return {
+      date: new Date(+(d.date * 1000)),
+      keystrokes: +d.keystrokes
+    }
+  });
+
+  const dataByHour = d3.nest()
+    .key((d) => d.date.getHours())
+    .rollup((v) => d3.sum(v, (d) => d.keystrokes))
+    .entries(data).map((d) => {
+      return {
+        hour: +d.key,
+        keystrokes: d.values
+      }
+    });
+
+  const xScale = d3.scale.linear()
+    .domain(d3.extent(dataByHour, (d) => d.hour))
+    .range([0, width]);
+
+  const yScale = d3.scale.linear()
+    .domain([0, d3.max(dataByHour, (d) => d.keystrokes)])
+    .range([height / 5, 0]);
+
+  const line = d3.svg.line()
+    .interpolate('basis')
+    .x((d, i) => xScale(i))
+    .y((d) => yScale(d.keystrokes));
+
+  svg
+    .append('path')
+    .datum(dataByHour)
+    .style('transform', `translate(0, ${(height / 5) * 4 - 20}px)`)
+    .style('opacity', '0.5')
+    .attr('fill', 'none')
+    .attr('stroke-width', 2)
+    .attr('stroke', 'white')
+    .attr('d', line);
+});
+
 /**
  * Gets volume from current keyboard audio and loops the render function
  */
