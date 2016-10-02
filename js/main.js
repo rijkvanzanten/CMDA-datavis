@@ -47,8 +47,6 @@ function getVolume(array) {
   return Math.floor(array.reduce((a, b) => a + b) / array.length);
 }
 
-
-
 const width = window.innerWidth;
 const height = window.innerHeight;
 
@@ -69,10 +67,9 @@ const color = d3.scale.linear()
   .interpolate(d3.interpolateLab);
 
 const xPosition = d3.random.normal(width / 2, (width / 2) - 250);
-const yPosition = () => Math.random() * height;
+const yPosition = d3.random.normal(height / 2, height / 9);
 
 const hexbin = d3.hexbin()
-  .size([width, height])
   .radius(height / 9);
 
 function render() {
@@ -94,7 +91,12 @@ function render() {
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .attr('class', 'hexagon')
       .attr('d', (d) => hexbin.hexagon())
-      .style('fill', 'white');
+      .style('fill', 'white')
+    .delay(100)
+    .transition()
+      .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
+      .style('fill', 'black')
+    .remove();
 }
 
 analyze();
