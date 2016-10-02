@@ -40,11 +40,6 @@ const svg = d3.select('body').append('svg')
   .attr('width', width)
   .attr('height', height);
 
-const color = d3.scale.linear()
-  .domain([0, 20])
-  .range('black', 'white')
-  .interpolate(d3.interpolateLab);
-
 const xPosition = d3.random.normal(width / 2, (width / 2) - 250);
 const yPosition = d3.random.normal(height / 2, height / 9);
 
@@ -56,17 +51,21 @@ const hexbin = d3.hexbin()
  * Gets volume from current keyboard audio and loops the render function
  */
 function renderLoop() {
-  audioAnalyser.getByteFrequencyData(dataArray);
+  window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+  window.requestAnimationFrame(renderLoop);
 
-  const volume = Math.floor(dataArray.reduce((a, b) => a + b) / dataArray.length)
+  const now = Date.now();
+  const delta = now - then;
 
-  if(volume > 0 && volume > (lastVol + 5)) {
-    render();
+  if(delta > drawInterval) {
+    audioAnalyser.getByteFrequencyData(dataArray);
+    const volume = Math.floor(dataArray.reduce((a, b) => a + b) / dataArray.length);
+    if(volume > 0 && volume > (lastVol + 5)) {
+      render();
+    }
+    lastVol = volume;
   }
 
-  lastVol = volume;
-
-  setTimeout(() => { renderLoop(); }, 10);
 }
 
 function render() {
@@ -77,6 +76,7 @@ function render() {
   hexagons
     .exit()
       .transition()
+      .delay(300)
         .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
         .style('fill', 'black')
     .remove();
@@ -85,12 +85,13 @@ function render() {
     .append('path')
     .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.9)`)
     .transition()
+    .duration(250)
       .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
       .attr('class', 'hexagon')
       .attr('d', (d) => hexbin.hexagon())
       .style('fill', 'white')
-    .delay(100)
     .transition()
+    .delay(300)
       .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
       .style('fill', 'black')
     .remove();
