@@ -65,7 +65,6 @@ function renderLoop() {
     }
     lastVol = volume;
   }
-
 }
 
 function render() {
@@ -77,8 +76,10 @@ function render() {
     .exit()
       .transition()
       .delay(300)
+      .ease('quad')
+      .duration(250)
         .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
-        .style('fill', 'black')
+        .style('opacity', 0)
     .remove();
 
   hexagons.enter(data)
@@ -93,7 +94,7 @@ function render() {
     .transition()
     .delay(300)
       .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
-      .style('fill', 'black')
+      .style('opacity', 0)
     .remove();
 }
 
