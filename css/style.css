@@ -1,21 +1,5 @@
-html {
-  background-color: #000000;
-  overflow: hidden;
-}
-
-svg {
-  position: absolute;
-  z-index: -1;
-  transform-style: preserve-3d;
-}
-
-svg, svg path, svg line, svg g {
-  transform-origin: center;
-}
-
-path {
-  stroke: #fff;
-  stroke-width: 2px;
+body {
+  height: 100vh;
 }
 
 .hexagon {
