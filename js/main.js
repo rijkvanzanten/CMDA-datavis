@@ -5,9 +5,6 @@
  * @fileoverview Datavisualisatie van keystrokes
  */
 
-// Audio part
-// -----------------------------------------------------------------------------
-
 const audio = new Audio();
 
 audio.src = 'mp3/keyboard.mp3';
@@ -28,24 +25,6 @@ const bufferLength = audioAnalyser.frequencyBinCount;
 let dataArray = new Uint8Array(bufferLength);
 
 let lastVol = 0;
-
-function analyze() {
-  audioAnalyser.getByteFrequencyData(dataArray);
-
-  const volume = getVolume(dataArray);
-
-  if(volume > 0 && volume > (lastVol + 5)) {
-    render();
-  }
-
-  lastVol = volume;
-
-  setTimeout(() => { analyze(); }, 10);
-}
-
-function getVolume(array) {
-  return Math.floor(array.reduce((a, b) => a + b) / array.length);
-}
 
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -71,6 +50,24 @@ const yPosition = d3.random.normal(height / 2, height / 9);
 
 const hexbin = d3.hexbin()
   .radius(height / 9);
+
+
+/**
+ * Gets volume from current keyboard audio and loops the render function
+ */
+function renderLoop() {
+  audioAnalyser.getByteFrequencyData(dataArray);
+
+  const volume = Math.floor(dataArray.reduce((a, b) => a + b) / dataArray.length)
+
+  if(volume > 0 && volume > (lastVol + 5)) {
+    render();
+  }
+
+  lastVol = volume;
+
+  setTimeout(() => { renderLoop(); }, 10);
+}
 
 function render() {
   const data = hexbin([[xPosition(), yPosition()]]);
@@ -99,4 +96,4 @@ function render() {
     .remove();
 }
 
-analyze();
+renderLoop();
