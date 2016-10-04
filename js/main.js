@@ -1,3 +1,5 @@
+/* global d3 */
+
 /**
  * @author Rijk van Zanten
  * @copyright 2016 Rijk van Zanten
@@ -40,7 +42,7 @@ const svg = d3.select('body').append('svg')
   .attr('width', width)
   .attr('height', height);
 
-const xPosition = d3.random.normal(width / 2, (width / 2) - 250);
+const xPosition = d3.random.normal(width / 2, width / 4);
 const yPosition = d3.random.normal(height / 2, height / 9);
 
 const hexbin = d3.hexbin()
@@ -79,11 +81,11 @@ svg.append('g')
   .attr('id', 'keystrokes');
 
 d3.csv('../data/keyfreq.txt', (json) => {
-  data = json.map((d) => {
+  const data = json.map((d) => {
     return {
       date: new Date(+(d.date * 1000)),
       keystrokes: +d.keystrokes
-    }
+    };
   });
 
   const dataByHour = d3.nest()
@@ -93,7 +95,7 @@ d3.csv('../data/keyfreq.txt', (json) => {
       return {
         hour: +d.key,
         keystrokes: d.values
-      }
+      };
     });
 
   const xScale = d3.scale.linear()
@@ -159,7 +161,7 @@ function render() {
       .append('path')
       .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.9)`)
       .attr('class', 'hexagon')
-      .attr('d', (d) => hexbin.hexagon())
+      .attr('d', () => hexbin.hexagon())
       .style('fill', 'white')
     .transition()
       .duration(250)
