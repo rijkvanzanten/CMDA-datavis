@@ -31,9 +31,7 @@ let lastVol = 0;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const framerate = 24;
-
-const drawInterval = 1000 / framerate;
+const drawInterval = 1000 / 60; // 1000 / framerate
 
 let then = Date.now();
 
@@ -75,7 +73,11 @@ svg.append('svg:rect')
 gradient.select('stop')
   .transition()
   .duration(10000)
-  .attr('stop-color', 'blue');
+  .attr('stop-color', 'blue')
+  .transition()
+  .delay(10000)
+  .duration(10000)
+  .attr('stop-color', 'green');
 
 svg.append('g')
   .attr('id', 'keystrokes');
@@ -135,7 +137,7 @@ function renderLoop() {
   if(delta > drawInterval) {
     audioAnalyser.getByteFrequencyData(dataArray);
     const volume = Math.floor(dataArray.reduce((a, b) => a + b) / dataArray.length);
-    if(volume > 0 && volume > (lastVol + 5)) {
+    if(volume > 0 && volume > (lastVol + 4)) {
       render();
     }
     lastVol = volume;
@@ -151,7 +153,6 @@ function render() {
     .exit()
       .transition()
       .delay(300)
-      .ease('quad')
       .duration(250)
         .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
         .style('opacity', 0)
@@ -163,6 +164,8 @@ function render() {
       .attr('class', 'hexagon')
       .attr('d', () => hexbin.hexagon())
       .style('fill', 'white')
+      .style('stroke', 'blue')
+      .style('stroke-width', 2)
     .transition()
       .duration(250)
         .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
