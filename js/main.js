@@ -66,6 +66,21 @@ class Render {
       .domain([0, d3.max(keystrokes, (d) => d.keystrokes)])
       .range([this.height / 5, 0]);
   }
+
+  static appendLineGraph(keystrokes) {
+    this.line = d3.svg.line()
+      .interpolate('basis')
+      .x((d) => this.lineXScale(d.date))
+      .y((d) => this.lineYScale(d.keystrokes));
+
+    this.svg.append('path')
+      .datum(keystrokes)
+      .attr('fill', 'none')
+      .attr('stroke-width', 1)
+      .attr('stroke', 'black')
+      .attr('d', this.line)
+      .attr('transform', `translate(0, ${this.height - this.height / 5})`);
+  }
 }
 
 class App {
@@ -76,6 +91,7 @@ class App {
     d3.csv('../data/keystrokes.csv', (json) => {
       const keystrokes = Helper.parseData(json);
       Render.setLineScales(keystrokes);
+      Render.appendLineGraph(keystrokes);
     });
   }
 }
