@@ -84,6 +84,14 @@ class Render {
 }
 
 class App {
+  static onMouseMove(e) {
+    const getDx = d3.scale.linear()
+      .domain([0, Render.width])
+      .range([-50, 50]);
+
+    this.speed = Math.round(getDx(d3.event.pageX));
+  }
+
   static init() {
     Render.initSVG();
     Render.placeMarkerLine();
@@ -93,6 +101,8 @@ class App {
       Render.setLineScales(keystrokes);
       Render.appendLineGraph(keystrokes);
     });
+
+    Render.svg.on('mousemove', this.onMouseMove);
   }
 }
 
