@@ -56,6 +56,16 @@ class Render {
       .attr('height', this.height / 5)
       .attr('width', 1);
   }
+
+  static setLineScales(keystrokes) {
+    this.lineXScale = d3.time.scale()
+      .domain(d3.extent(keystrokes, (d) => d.date))
+      .rangeRound([0, this.width * 28]);
+
+    this.lineYScale = d3.scale.linear()
+      .domain([0, d3.max(keystrokes, (d) => d.keystrokes)])
+      .range([this.height / 5, 0]);
+  }
 }
 
 class App {
@@ -65,6 +75,7 @@ class App {
 
     d3.csv('../data/keystrokes.csv', (json) => {
       const keystrokes = Helper.parseData(json);
+      Render.setLineScales(keystrokes);
     });
   }
 }
