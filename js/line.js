@@ -22,6 +22,8 @@ d3.csv('../data/keystrokes.csv', (json) => {
   const keystrokes = parseData(json);
   const { lineXScale, lineYScale } = setLineScales(keystrokes);
   appendLine(keystrokes, lineXScale, lineYScale);
+
+  render();
 });
 
 function parseData(data) {

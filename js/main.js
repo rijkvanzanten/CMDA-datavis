@@ -36,6 +36,10 @@ class Helper {
 
     return keyStrokesByHourParsed;
   }
+
+  static getDataPoint(keystrokes, xPos) {
+    return keystrokes[d3.bisector(d => d.date).left(keystrokes, Render.lineXScale.invert(xPos))];
+  }
 }
 
 class Render {
@@ -84,7 +88,7 @@ class Render {
 }
 
 class App {
-  static onMouseMove(e) {
+  static onMouseMove() {
     const getDx = d3.scale.linear()
       .domain([0, Render.width])
       .range([-50, 50]);
@@ -97,12 +101,14 @@ class App {
     Render.placeMarkerLine();
 
     d3.csv('../data/keystrokes.csv', (json) => {
-      const keystrokes = Helper.parseData(json);
-      Render.setLineScales(keystrokes);
-      Render.appendLineGraph(keystrokes);
-    });
+      this.keystrokes = Helper.parseData(json);
+      Render.setLineScales(this.keystrokes);
+      Render.appendLineGraph(this.keystrokes);
+      Render.svg.on('mousemove', this.onMouseMove.bind(this));
 
-    Render.svg.on('mousemove', this.onMouseMove);
+      console.log(Helper.getDataPoint(this.keystrokes, Render.width / 2));
+
+    });
   }
 }
 
