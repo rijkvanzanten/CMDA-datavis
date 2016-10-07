@@ -53,12 +53,24 @@ class Render {
       .attr('height', this.height);
   }
 
-  static placeMarkerLine() {
-    this.svg.append('rect')
+  static initDateShow() {
+    this.svg.append('text')
+      .attr('id', 'datetime')
+      .attr('font-family', 'Comic Sans MS')
+      .attr('fill', 'white')
+      .attr('font-size', '20px')
+      .attr('text-anchor', 'middle')
       .attr('x', this.width / 2)
-      .attr('y', this.height - this.height / 5)
-      .attr('height', this.height / 5)
-      .attr('width', 1);
+      .attr('y', 50);
+  }
+
+  static updateDateShow(date) {
+    const dateString = `
+    ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}
+    ${date.getHours()}:00
+    `;
+    this.svg.select('#datetime')
+      .text(dateString);
   }
 
   static setLineScales(keystrokes) {
@@ -96,13 +108,37 @@ class Render {
       d3.select('#line').attr('transform', `translate(${this.lineX},${this.height - this.height / 5})`);
     }
   }
+
+  static initBackground() {
+    this.colors = function(hours) {
+      const colors = ['#020026', '#fbedcb', '#4fa3e1', '#fc8a54', '#020026'];
+      const i = Math.floor(d3.scale.linear().domain([0, 23]).range([0, colors.length - 1])(hours));
+      return colors[i];
+    };
+    this.svg.append('rect')
+      .attr('id', 'background')
+      .attr('fill', 'blue')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', this.colors(1));
+  }
+
+  static changeBackground(hours) {
+    if(hours !== this.lastBackgroundHours) {
+      d3.select('#background')
+        .transition()
+        .duration(2000)
+        .attr('fill', this.colors(hours));
+    }
+    this.lastBackgroundHours = hours;
+  }
 }
 
 class App {
   static onMouseMove() {
     const getDx = d3.scale.linear()
       .domain([0, Render.width])
-      .range([-50, 50]);
+      .range([-25, 25]);
 
     this.speed = Math.round(getDx(d3.event.pageX));
   }
@@ -121,7 +157,10 @@ class App {
       const delta = now - then;
 
       if(delta > drawInterval) {
+        const dataPoint = Helper.getDataPoint(this.keystrokes, -(Render.lineX - Render.width / 2));
         Render.moveLineChart(this.speed);
+        Render.changeBackground(dataPoint.date.getHours());
+        Render.updateDateShow(dataPoint.date);
       }
     };
 
@@ -130,7 +169,8 @@ class App {
 
   static init() {
     Render.initSVG();
-    Render.placeMarkerLine();
+    Render.initBackground();
+    Render.initDateShow();
 
     this.speed = 0;
 
@@ -139,9 +179,6 @@ class App {
       Render.setLineScales(this.keystrokes);
       Render.appendLineGraph(this.keystrokes);
       Render.svg.on('mousemove', this.onMouseMove.bind(this));
-
-      console.log(Helper.getDataPoint(this.keystrokes, Render.width / 2));
-
       this.startRenderLoop();
     });
   }
