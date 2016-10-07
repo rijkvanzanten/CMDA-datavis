@@ -111,7 +111,7 @@ class Render {
 
   static initBackground() {
     this.colors = function(hours) {
-      const colors = ['#020026', '#fbedcb', '#4fa3e1', '#fc8a54', '#020026'];
+      const colors = ['#020026', '#fbedcb', '#4fa3e1', '#4fa3e1', '#fc8a54', '#020026'];
       const i = Math.floor(d3.scale.linear().domain([0, 23]).range([0, colors.length - 1])(hours));
       return colors[i];
     };
@@ -138,7 +138,7 @@ class App {
   static onMouseMove() {
     const getDx = d3.scale.linear()
       .domain([0, Render.width])
-      .range([-25, 25]);
+      .range([-15, 15]);
 
     this.speed = Math.round(getDx(d3.event.pageX));
   }
