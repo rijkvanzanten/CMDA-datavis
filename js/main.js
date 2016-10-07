@@ -72,6 +72,8 @@ class Render {
   }
 
   static appendLineGraph(keystrokes) {
+    this.lineX = (this.width / 2);
+
     this.line = d3.svg.line()
       .interpolate('basis')
       .x((d) => this.lineXScale(d.date))
@@ -79,11 +81,20 @@ class Render {
 
     this.svg.append('path')
       .datum(keystrokes)
+      .attr('id', 'line')
       .attr('fill', 'none')
       .attr('stroke-width', 1)
       .attr('stroke', 'black')
       .attr('d', this.line)
-      .attr('transform', `translate(0, ${this.height - this.height / 5})`);
+      .attr('transform', `translate(${this.lineX}, ${this.height - this.height / 5})`);
+  }
+
+  static moveLineChart(dx) {
+    const newX = this.lineX - dx;
+    if(newX < this.width / 2 && newX > -(this.width * 28 - this.width / 2)) {
+      this.lineX = newX;
+      d3.select('#line').attr('transform', `translate(${this.lineX},${this.height - this.height / 5})`);
+    }
   }
 }
 
@@ -96,9 +107,32 @@ class App {
     this.speed = Math.round(getDx(d3.event.pageX));
   }
 
+  static startRenderLoop() {
+    window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+    let then = Date.now();
+
+    const drawInterval = 1000 / 24;
+
+    const render = () => { // arrow want this binding
+      window.requestAnimationFrame(render);
+
+      const now = Date.now();
+      const delta = now - then;
+
+      if(delta > drawInterval) {
+        Render.moveLineChart(this.speed);
+      }
+    };
+
+    render();
+  }
+
   static init() {
     Render.initSVG();
     Render.placeMarkerLine();
+
+    this.speed = 0;
 
     d3.csv('../data/keystrokes.csv', (json) => {
       this.keystrokes = Helper.parseData(json);
@@ -108,6 +142,7 @@ class App {
 
       console.log(Helper.getDataPoint(this.keystrokes, Render.width / 2));
 
+      this.startRenderLoop();
     });
   }
 }
