@@ -1,4 +1,12 @@
 /* global d3 */
+
+/**
+ * @author Rijk van Zanten
+ * @copyright 2016 Rijk van Zanten
+ * @license MIT
+ * @fileoverview Datavisualisatie van keystrokes
+ */
+
 class Helper {
   static getWidth() {
     return window.innerWidth;
@@ -16,35 +24,6 @@ class Helper {
 
   static getAudioLevel(keystrokes) {
     return Math.round(this.audioScale(keystrokes));
-  }
-
-  static parseData(json) {
-    const keystrokes = json.map((d) => {
-      return {
-        date: new Date(Number(d.date) * 1000),
-        keystrokes: Number(d.keystrokes)
-      };
-    });
-
-    const keyStrokesByHourNested = d3.nest()
-      .key((d) => d.date.getDate())
-      .key((d) => d.date.getHours())
-      .rollup((v) => {
-      return {
-        keystrokes: d3.sum(v, (d) => d.keystrokes),
-        date: new Date(2016, v[0].date.getMonth(), v[0].date.getDate(), v[0].date.getHours(), 0)
-      };})
-      .entries(keystrokes);
-
-    let keyStrokesByHourParsed = [];
-    keyStrokesByHourNested.forEach((keyStrokesByDay) => {
-      keyStrokesByDay.values.forEach((keyStrokesByHour) => {
-        const { date, keystrokes } = keyStrokesByHour.values;
-        keyStrokesByHourParsed.push({date, keystrokes});
-      });
-    });
-
-    return keyStrokesByHourParsed;
   }
 
   static setDataPointScale(lineElement, keystrokes) {
@@ -189,7 +168,6 @@ class AudioPlayer {
     if(level !== this.previousAudioLevel) {
       const { audio } = this;
       audio.volume = level / 100;
-      console.log(level, audio.volume);
       this.previousAudioLevel = level;
     }
   }
@@ -241,8 +219,13 @@ class App {
 
     this.speed = 0;
 
-    d3.csv('../data/keystrokes.csv', (json) => {
-      this.keystrokes = Helper.parseData(json);
+    d3.json('../data/data.json', (json) => {
+      this.keystrokes = json.map((single) => {
+        return {
+          date: new Date(single.date),
+          keystrokes: single.keystrokes
+        };
+      });
       Render.setLineScales(this.keystrokes);
       Render.appendLineGraph(this.keystrokes);
       Helper.setDataPointScale(Render.line, this.keystrokes);
