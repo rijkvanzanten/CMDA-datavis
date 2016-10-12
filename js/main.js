@@ -135,10 +135,14 @@ class Render {
 
 class AudioPlayer {
   static init() {
-    const bgAudio = new Audio;
+    const bgAudio = new Audio();
     bgAudio.loop = true;
     bgAudio.autoplay = true;
     bgAudio.src = 'mp3/bg.mp3';
+
+    const ambientAudio = new Audio();
+    ambientAudio.loop = true;
+    ambientAudio.autoplay = true;
 
     const audio = new Audio();
     audio.loop = true;
@@ -157,7 +161,7 @@ class AudioPlayer {
 
     const bufferLength = audioAnalyser.frequencyBinCount;
 
-    Object.assign(this, { audio, audioContext, audioAnalyser, audioSource, bufferLength});
+    Object.assign(this, { audio, ambientAudio, audioContext, audioAnalyser, audioSource, bufferLength});
 
     this.dataArray = new Uint8Array(bufferLength);
 
@@ -169,6 +173,23 @@ class AudioPlayer {
       const { audio } = this;
       audio.volume = level / 100;
       this.previousAudioLevel = level;
+    }
+  }
+
+  static changeAmbientAudio(date) {
+    if(date !== this.lastDate) {
+
+      if(date.getDate() === 3 && date.getHours() > 10 && date.getHours() < 16) {
+        if(this.lastAmbientSrc !== 'mp3/gamen.mp3') {
+          this.ambientAudio.src = 'mp3/gamen.mp3';
+          this.lastAmbientSrc = 'mp3/gamen.mp3';
+        }
+        this.ambientAudio.volume = 1;
+      } else {
+        this.ambientAudio.volume = 0;
+      }
+
+      this.lastDate = date;
     }
   }
 }
@@ -204,13 +225,14 @@ class App {
         Render.updateDateShow(nearestHourlyDataPoint.date);
 
         AudioPlayer.changeAudio(Helper.getAudioLevel(keystrokesAtCurrentXPosition));
+        AudioPlayer.changeAmbientAudio(nearestHourlyDataPoint.date);
       }
     };
 
     render();
   }
 
-  static init() {
+  static start() {
     Render.initSVG();
     Render.initBackground();
     Render.initDateShow();
@@ -230,11 +252,11 @@ class App {
       Render.appendLineGraph(this.keystrokes);
       Helper.setDataPointScale(Render.line, this.keystrokes);
       Render.svg.on('mousemove', this.onMouseMove.bind(this));
-      this.startRenderLoop();
-
       Helper.setAudioLevelScale(this.keystrokes);
+
+      this.startRenderLoop();
     });
   }
 }
 
-App.init();
+App.start();

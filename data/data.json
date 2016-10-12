@@ -49,7 +49,7 @@
   },
   {
     "date": "2016-09-27T17:00:00.000Z",
-    "keystrokes": 0
+    "keystrokes": 521
   },
   {
     "date": "2016-09-27T18:00:00.000Z",
@@ -61,15 +61,15 @@
   },
   {
     "date": "2016-09-27T20:00:00.000Z",
-    "keystrokes": 0
+    "keystrokes": 689
   },
   {
     "date": "2016-09-27T21:00:00.000Z",
-    "keystrokes": 0
+    "keystrokes": 761
   },
   {
     "date": "2016-09-27T22:00:00.000Z",
-    "keystrokes": 0
+    "keystrokes": 242
   },
   {
     "date": "2016-09-27T23:00:00.000Z",
@@ -601,15 +601,19 @@
   },
   {
     "date": "2016-10-03T11:00:00.000Z",
-    "keystrokes": 347
+    "keystrokes": 0
+  },
+  {
+    "date": "2016-10-03T12:00:00.000Z",
+    "keystrokes": 0
   },
   {
     "date": "2016-10-03T13:00:00.000Z",
-    "keystrokes": 555
+    "keystrokes": 0
   },
   {
     "date": "2016-10-03T14:00:00.000Z",
-    "keystrokes": 1669
+    "keystrokes": 555
   },
   {
     "date": "2016-10-03T15:00:00.000Z",
@@ -617,7 +621,7 @@
   },
   {
     "date": "2016-10-03T16:00:00.000Z",
-    "keystrokes": 79
+    "keystrokes": 1669
   },
   {
     "date": "2016-10-03T17:00:00.000Z",
