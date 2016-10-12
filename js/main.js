@@ -284,7 +284,7 @@ class App {
         const keystrokesAtCurrentXPosition = Helper.getDataPoint(xPos);
         const nearestHourlyDataPoint = Helper.getCurrentHour(this.keystrokes, xPos);
 
-        // Move line
+        // Move line and update
         Render.moveLineChart(this.speed);
         Render.changeBackground(nearestHourlyDataPoint.date.getHours());
         Render.updateDateShow(nearestHourlyDataPoint.date);
