@@ -10,7 +10,7 @@ class Helper {
 
   static setAudioLevelScale(keystrokes) {
     this.audioScale = d3.scale.linear()
-      .range([0, 30])
+      .range([0, 100])
       .domain(d3.extent(keystrokes, (d) => d.keystrokes));
   }
 
@@ -188,7 +188,7 @@ class AudioPlayer {
   static changeAudio(level) {
     if(level !== this.previousAudioLevel) {
       const { audio } = this;
-      audio.volume = level % 10 === 0 && level !== 0 ? 1 : level % 10 / 10;
+      audio.volume = level / 100;
       console.log(level, audio.volume);
       this.previousAudioLevel = level;
     }
