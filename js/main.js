@@ -39,6 +39,14 @@ class Helper {
   static getCurrentHour(keystrokes, xPos) {
     return keystrokes[d3.bisector(d => d.date).left(keystrokes, Render.lineXScale.invert(xPos))];
   }
+
+  static randomYPosition() {
+    return d3.random.normal(this.getHeight() / 2, this.getHeight() / 9)();
+  }
+
+  static randomXPosition() {
+    return d3.random.normal(this.getWidth() / 2, this.getWidth() / 4)();
+  }
 }
 
 class Render {
@@ -52,10 +60,19 @@ class Render {
       .attr('height', this.height);
   }
 
+  static initHexbin() {
+    this.hexbin = d3.hexbin()
+      .radius(Helper.getHeight() / 9);
+
+    this.keystrokesGroup = this.svg.append('g')
+      .attr('id', 'keystrokes');
+  }
+
   static initDateShow() {
     this.svg.append('text')
       .attr('id', 'datetime')
-      .attr('font-family', 'Comic Sans MS')
+      .attr('font-family', 'Helvetica Neue')
+      .attr('opacity', '0.8')
       .attr('fill', 'white')
       .attr('font-size', '20px')
       .attr('text-anchor', 'middle')
@@ -95,16 +112,17 @@ class Render {
       .attr('id', 'line')
       .attr('fill', 'none')
       .attr('stroke-width', 1)
-      .attr('stroke', 'black')
+      .attr('stroke', 'white')
+      .attr('opacity', '0.8')
       .attr('d', this.line)
-      .attr('transform', `translate(${this.lineX}, ${this.height - this.height / 5})`);
+      .attr('transform', `translate(${this.lineX}, ${this.height / 2 - this.height / 5})`);
   }
 
   static moveLineChart(dx) {
     const newX = this.lineX - dx;
     if(newX < this.width / 2 && newX > -(this.width * 28 - this.width / 2)) {
       this.lineX = newX;
-      d3.select('#line').attr('transform', `translate(${this.lineX},${this.height - this.height / 5})`);
+      d3.select('#line').attr('transform', `translate(${this.lineX},${this.height / 2 - this.height / 5})`);
     }
   }
 
@@ -130,6 +148,39 @@ class Render {
         .attr('fill', this.colors(hours));
     }
     this.lastBackgroundHours = hours;
+  }
+
+  static placeHexagon() {
+    const data = this.hexbin([[Helper.randomXPosition(), Helper.randomYPosition()]]);
+
+    const hexagons = this.svg.select('#keystrokes').selectAll('.hexagon').data(data, (d) => d);
+
+    hexagons
+      .exit()
+        .transition()
+        .delay(300)
+        .duration(250)
+          .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
+          .style('opacity', 0)
+      .remove();
+
+    hexagons.enter(data)
+        .append('path')
+        .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.9)`)
+        .attr('class', 'hexagon')
+        .attr('d', () => this.hexbin.hexagon())
+        .style('fill', 'white')
+        .style('stroke', 'blue')
+        .style('stroke-width', 2)
+        .style('opacity', AudioPlayer.currentVolume())
+      .transition()
+        .duration(250)
+          .attr('transform', (d) => `translate(${d.x}, ${d.y})`)
+      .transition()
+      .delay(300)
+        .attr('transform', (d) => `translate(${d.x}, ${d.y}) scale(0.5)`)
+        .style('opacity', 0)
+      .remove();
   }
 }
 
@@ -192,6 +243,15 @@ class AudioPlayer {
       this.lastDate = date;
     }
   }
+
+  static getVolume() {
+    this.audioAnalyser.getByteFrequencyData(this.dataArray);
+    return Math.floor(this.dataArray.reduce((a, b) => a + b) / this.dataArray.length);
+  }
+
+  static currentVolume() {
+    return this.audio.volume;
+  }
 }
 
 class App {
@@ -208,7 +268,9 @@ class App {
 
     let then = Date.now();
 
-    const drawInterval = 1000 / 24;
+    const drawInterval = 1000 / 30;
+
+    let lastVol = 0;
 
     const render = () => {
       window.requestAnimationFrame(render);
@@ -217,15 +279,28 @@ class App {
       const delta = now - then;
 
       if(delta > drawInterval) {
+        // Get data of current point on line
         const xPos = -(Render.lineX - Render.width / 2);
         const keystrokesAtCurrentXPosition = Helper.getDataPoint(xPos);
         const nearestHourlyDataPoint = Helper.getCurrentHour(this.keystrokes, xPos);
+
+        // Move line
         Render.moveLineChart(this.speed);
         Render.changeBackground(nearestHourlyDataPoint.date.getHours());
         Render.updateDateShow(nearestHourlyDataPoint.date);
 
+        // Change audio playback
         AudioPlayer.changeAudio(Helper.getAudioLevel(keystrokesAtCurrentXPosition));
         AudioPlayer.changeAmbientAudio(nearestHourlyDataPoint.date);
+
+        // Place hexagons based on audio levels
+        const volume = AudioPlayer.getVolume();
+        if(volume > 0 && volume > lastVol) {
+          Render.placeHexagon();
+        }
+        lastVol = volume;
+
+        then = now;
       }
     };
 
@@ -236,6 +311,7 @@ class App {
     Render.initSVG();
     Render.initBackground();
     Render.initDateShow();
+    Render.initHexbin();
 
     AudioPlayer.init();
 
