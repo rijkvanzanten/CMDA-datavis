@@ -156,16 +156,16 @@ class Render {
 
 class AudioPlayer {
   static init() {
+    const bgAudio = new Audio;
+    bgAudio.loop = true;
+    bgAudio.autoplay = true;
+    bgAudio.src = 'mp3/bg.mp3';
 
-        const audioFiles = {
-          slow: 'mp3/slow.mp3',
-          medium: 'mp3/medium.mp3',
-          fast: 'mp3/fast.mp3'
-        };
     const audio = new Audio();
     audio.loop = true;
     audio.autoplay = true;
-    audio.src = audioFiles.fast;
+    audio.volume = 0;
+    audio.src = 'mp3/fast.mp3';
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -178,7 +178,7 @@ class AudioPlayer {
 
     const bufferLength = audioAnalyser.frequencyBinCount;
 
-    Object.assign(this, { audio, audioFiles, audioContext, audioAnalyser, audioSource, bufferLength});
+    Object.assign(this, { audio, audioContext, audioAnalyser, audioSource, bufferLength});
 
     this.dataArray = new Uint8Array(bufferLength);
 
@@ -187,22 +187,9 @@ class AudioPlayer {
 
   static changeAudio(level) {
     if(level !== this.previousAudioLevel) {
-      console.log(level);
       const { audio } = this;
       audio.volume = level % 10 === 0 && level !== 0 ? 1 : level % 10 / 10;
-      // if(level === 0) {
-      //   audio.pause();
-      // } else if(level > 0 && level < 6) {
-      //   audio.src = 'mp3/slow.mp3';
-      //   if(audio.paused) audio.play();
-      // } else if(level > 6 && level <= 20) {
-      //   audio.src = 'mp3/medium.mp3';
-      //   if(audio.paused) audio.play();
-      // } else if(level > 20) {
-      //   audio.src = 'mp3/fast.mp3';
-      //   if(audio.paused) audio.play();
-      // }
-
+      console.log(level, audio.volume);
       this.previousAudioLevel = level;
     }
   }
