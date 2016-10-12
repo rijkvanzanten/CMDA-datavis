@@ -8,6 +8,16 @@ class Helper {
     return window.innerHeight;
   }
 
+  static setAudioLevelScale(keystrokes) {
+    this.audioScale = d3.scale.linear()
+      .range([0, 30])
+      .domain(d3.extent(keystrokes, (d) => d.keystrokes));
+  }
+
+  static getAudioLevel(keystrokes) {
+    return Math.round(this.audioScale(keystrokes));
+  }
+
   static parseData(json) {
     const keystrokes = json.map((d) => {
       return {
@@ -37,7 +47,17 @@ class Helper {
     return keyStrokesByHourParsed;
   }
 
-  static getDataPoint(keystrokes, xPos) {
+  static setDataPointScale(lineElement, keystrokes) {
+    this.dataPointScale = d3.scale.linear()
+      .range(d3.extent(keystrokes, (d) => d.keystrokes))
+      .domain([this.getHeight() / 5, 0]);
+  }
+
+  static getDataPoint(xPos) {
+    return + Math.round(this.dataPointScale(document.querySelector('#line').getPointAtLength(xPos).y));
+  }
+
+  static getCurrentHour(keystrokes, xPos) {
     return keystrokes[d3.bisector(d => d.date).left(keystrokes, Render.lineXScale.invert(xPos))];
   }
 }
@@ -91,7 +111,7 @@ class Render {
       .x((d) => this.lineXScale(d.date))
       .y((d) => this.lineYScale(d.keystrokes));
 
-    this.svg.append('path')
+    this.line = this.svg.append('path')
       .datum(keystrokes)
       .attr('id', 'line')
       .attr('fill', 'none')
@@ -134,6 +154,60 @@ class Render {
   }
 }
 
+class AudioPlayer {
+  static init() {
+
+        const audioFiles = {
+          slow: 'mp3/slow.mp3',
+          medium: 'mp3/medium.mp3',
+          fast: 'mp3/fast.mp3'
+        };
+    const audio = new Audio();
+    audio.loop = true;
+    audio.autoplay = true;
+    audio.src = audioFiles.fast;
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    const audioAnalyser =  audioContext.createAnalyser();
+    audioAnalyser.fftSize = 1024;
+
+    const audioSource =  audioContext.createMediaElementSource(audio);
+    audioSource.connect(audioAnalyser);
+    audioAnalyser.connect( audioContext.destination);
+
+    const bufferLength = audioAnalyser.frequencyBinCount;
+
+    Object.assign(this, { audio, audioFiles, audioContext, audioAnalyser, audioSource, bufferLength});
+
+    this.dataArray = new Uint8Array(bufferLength);
+
+    this.previousAudioLevel = 0;
+  }
+
+  static changeAudio(level) {
+    if(level !== this.previousAudioLevel) {
+      console.log(level);
+      const { audio } = this;
+      audio.volume = level % 10 === 0 && level !== 0 ? 1 : level % 10 / 10;
+      // if(level === 0) {
+      //   audio.pause();
+      // } else if(level > 0 && level < 6) {
+      //   audio.src = 'mp3/slow.mp3';
+      //   if(audio.paused) audio.play();
+      // } else if(level > 6 && level <= 20) {
+      //   audio.src = 'mp3/medium.mp3';
+      //   if(audio.paused) audio.play();
+      // } else if(level > 20) {
+      //   audio.src = 'mp3/fast.mp3';
+      //   if(audio.paused) audio.play();
+      // }
+
+      this.previousAudioLevel = level;
+    }
+  }
+}
+
 class App {
   static onMouseMove() {
     const getDx = d3.scale.linear()
@@ -150,17 +224,21 @@ class App {
 
     const drawInterval = 1000 / 24;
 
-    const render = () => { // arrow want this binding
+    const render = () => {
       window.requestAnimationFrame(render);
 
       const now = Date.now();
       const delta = now - then;
 
       if(delta > drawInterval) {
-        const dataPoint = Helper.getDataPoint(this.keystrokes, -(Render.lineX - Render.width / 2));
+        const xPos = -(Render.lineX - Render.width / 2);
+        const keystrokesAtCurrentXPosition = Helper.getDataPoint(xPos);
+        const nearestHourlyDataPoint = Helper.getCurrentHour(this.keystrokes, xPos);
         Render.moveLineChart(this.speed);
-        Render.changeBackground(dataPoint.date.getHours());
-        Render.updateDateShow(dataPoint.date);
+        Render.changeBackground(nearestHourlyDataPoint.date.getHours());
+        Render.updateDateShow(nearestHourlyDataPoint.date);
+
+        AudioPlayer.changeAudio(Helper.getAudioLevel(keystrokesAtCurrentXPosition));
       }
     };
 
@@ -172,14 +250,19 @@ class App {
     Render.initBackground();
     Render.initDateShow();
 
+    AudioPlayer.init();
+
     this.speed = 0;
 
     d3.csv('../data/keystrokes.csv', (json) => {
       this.keystrokes = Helper.parseData(json);
       Render.setLineScales(this.keystrokes);
       Render.appendLineGraph(this.keystrokes);
+      Helper.setDataPointScale(Render.line, this.keystrokes);
       Render.svg.on('mousemove', this.onMouseMove.bind(this));
       this.startRenderLoop();
+
+      Helper.setAudioLevelScale(this.keystrokes);
     });
   }
 }
