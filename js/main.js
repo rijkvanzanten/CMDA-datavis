@@ -199,7 +199,7 @@ class AudioPlayer {
     audio.loop = true;
     audio.autoplay = true;
     audio.volume = 0;
-    audio.src = 'mp3/fast.mp3';
+    audio.src = 'mp3/keyboard.mp3';
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
