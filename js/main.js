@@ -227,23 +227,6 @@ class AudioPlayer {
     }
   }
 
-  static changeAmbientAudio(date) {
-    // if(date !== this.lastDate) {
-    //
-    //   if(date.getDate() === 3 && date.getHours() > 10 && date.getHours() < 16) {
-    //     if(this.lastAmbientSrc !== 'mp3/gamen.mp3') {
-    //       this.ambientAudio.src = 'mp3/gamen.mp3';
-    //       this.lastAmbientSrc = 'mp3/gamen.mp3';
-    //     }
-    //     this.ambientAudio.volume = 1;
-    //   } else {
-    //     this.ambientAudio.volume = 0;
-    //   }
-    //
-    //   this.lastDate = date;
-    // }
-  }
-
   static getVolume() {
     this.audioAnalyser.getByteFrequencyData(this.dataArray);
     return Math.floor(this.dataArray.reduce((a, b) => a + b) / this.dataArray.length);
@@ -291,7 +274,6 @@ class App {
 
         // Change audio playback
         AudioPlayer.changeAudio(Helper.getAudioLevel(keystrokesAtCurrentXPosition));
-        AudioPlayer.changeAmbientAudio(nearestHourlyDataPoint.date);
 
         // Place hexagons based on audio levels
         const volume = AudioPlayer.getVolume();
