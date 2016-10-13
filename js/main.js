@@ -81,9 +81,17 @@ class Render {
   }
 
   static updateDateShow(date) {
-    const dateString = `${date.getHours()}:00`;
-    this.svg.select('#datetime')
-      .text(dateString);
+    if(date !== this.lastDate) {
+      const dateString = `${date.getHours()}:00`;
+      this.svg.select('#datetime')
+        .text(dateString);
+
+      if(date.getHours() === 0) {
+        
+      }
+
+      this.lastDate = date;
+    }
   }
 
   static setLineScales(keystrokes) {
@@ -125,7 +133,10 @@ class Render {
 
   static initBackground() {
     this.colors = function(hours) {
-      const colors = ['#020026', '#fbedcb', '#4fa3e1', '#4fa3e1', '#fc8a54', '#020026'];
+      const colors = [
+        '#100631', '#201448', '#311448', '#c7ac9b', '#f6aa73', '#9facb8',
+        '#67a9cf', '#48a2f4', '#5fd4ff', '#48a2f4', '#67a9cf',
+        '#9facb8', '#f6aa73', '#c7ac9b', '#311448', '#201448', '#100631'];
       const i = Math.floor(d3.scale.linear().domain([0, 23]).range([0, colors.length - 1])(hours));
       return colors[i];
     };
@@ -141,7 +152,7 @@ class Render {
     if(hours !== this.lastBackgroundHours) {
       d3.select('#background')
         .transition()
-        .duration(2000)
+        .duration(3000)
         .attr('fill', this.colors(hours));
     }
     this.lastBackgroundHours = hours;
