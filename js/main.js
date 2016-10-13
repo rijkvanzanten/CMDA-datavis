@@ -72,19 +72,16 @@ class Render {
     this.svg.append('text')
       .attr('id', 'datetime')
       .attr('font-family', 'Helvetica Neue')
-      .attr('opacity', '0.8')
+      .attr('opacity', '0.2')
       .attr('fill', 'white')
-      .attr('font-size', '20px')
-      .attr('text-anchor', 'middle')
-      .attr('x', this.width / 2)
-      .attr('y', 50);
+      .attr('font-size', '150px')
+      .attr('text-anchor', 'right')
+      .attr('x', 10)
+      .attr('y', this.height - 20);
   }
 
   static updateDateShow(date) {
-    const dateString = `
-    ${date.getDate()}/${date.getMonth()}/${date.getFullYear()}
-    ${date.getHours()}:00
-    `;
+    const dateString = `${date.getHours()}:00`;
     this.svg.select('#datetime')
       .text(dateString);
   }
