@@ -171,10 +171,10 @@ define(['helper'], (Helper) => { // eslint-disable-line
 
       setTimeout(() => {
         renderText('The color indicates the program that was used');
-        addHexagon('Safari',    'blue',   this.width / 5 * 1 - 37.50, this.height / 1.5);
-        addHexagon('Atom',      'green',  this.width / 5 * 2 - 37.50, this.height / 1.5);
-        addHexagon('Terminal',  'grey',   this.width / 5 * 3 - 37.50, this.height / 1.5);
-        addHexagon('Chrome',    'yellow', this.width / 5 * 4 - 37.50, this.height / 1.5);
+        addHexagon('Safari',    Helper.getColor('Safari'),    this.width / 5 * 1 - 37.50, this.height / 1.5);
+        addHexagon('Atom',      Helper.getColor('Atom'),      this.width / 5 * 2 - 37.50, this.height / 1.5);
+        addHexagon('Terminal',  Helper.getColor('Terminal'),  this.width / 5 * 3 - 37.50, this.height / 1.5);
+        addHexagon('Chrome',    Helper.getColor('Chrome'),    this.width / 5 * 4 - 37.50, this.height / 1.5);
       }, 10000);
 
       setTimeout(() => {
