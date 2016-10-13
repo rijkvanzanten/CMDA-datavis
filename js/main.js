@@ -16,6 +16,19 @@ class Helper {
     return window.innerHeight;
   }
 
+  static getColor(programName) {
+    const colors = {
+      Atom: '#1ba976',
+      Safari: '#0197c6',
+      Terminal: '#323232',
+      Chrome: '#ffce42'
+    };
+
+    console.log(programName);
+
+    return colors[programName];
+  }
+
   static setAudioLevelScale(keystrokes) {
     this.audioScale = d3.scale.linear()
       .range([0, 100])
@@ -174,9 +187,8 @@ class Render {
     this.lastBackgroundHours = hours;
   }
 
-  static placeHexagon() {
+  static placeHexagon(color) {
     const data = this.hexbin([[Helper.randomXPosition(), Helper.randomYPosition()]]);
-
     const hexagons = this.svg.select('#keystrokes').selectAll('.hexagon').data(data, (d) => d);
 
     hexagons
@@ -194,8 +206,8 @@ class Render {
         .attr('class', 'hexagon')
         .attr('d', () => this.hexbin.hexagon())
         .style('fill', 'white')
-        .style('stroke', 'blue')
-        .style('stroke-width', 2)
+        .style('stroke', color)
+        .style('stroke-width', 4)
         .style('opacity', AudioPlayer.currentVolume())
       .transition()
         .duration(250)
@@ -302,7 +314,7 @@ class App {
         // Place hexagons based on audio levels
         const volume = AudioPlayer.getVolume();
         if(volume > 0 && volume > lastVol) {
-          Render.placeHexagon();
+          Render.placeHexagon(Helper.getColor(nearestHourlyDataPoint.window));
         }
         lastVol = volume;
 
@@ -327,7 +339,8 @@ class App {
       this.keystrokes = json.map((single) => {
         return {
           date: new Date(single.date),
-          keystrokes: single.keystrokes
+          keystrokes: single.keystrokes,
+          window: single.window
         };
       });
       Render.setLineScales(this.keystrokes);
