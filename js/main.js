@@ -270,10 +270,6 @@ class AudioPlayer {
     bgAudio.autoplay = true;
     bgAudio.src = 'mp3/bg.mp3';
 
-    const ambientAudio = new Audio();
-    ambientAudio.loop = true;
-    ambientAudio.autoplay = true;
-
     const audio = new Audio();
     audio.loop = true;
     audio.autoplay = true;
@@ -291,7 +287,7 @@ class AudioPlayer {
 
     const bufferLength = audioAnalyser.frequencyBinCount;
 
-    Object.assign(this, { audio, ambientAudio, audioContext, audioAnalyser, audioSource, bufferLength});
+    Object.assign(this, { audio, audioContext, audioAnalyser, audioSource, bufferLength});
 
     this.dataArray = new Uint8Array(bufferLength);
 
