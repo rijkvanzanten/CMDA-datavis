@@ -111,6 +111,30 @@ class Render {
       .remove();
     };
 
+    const addHexagon = (label, borderColor, x, y) => {
+      this.splash.append('svg:polygon')
+        .style('fill', 'white')
+        .style('stroke-width', '4')
+        .style('stroke', borderColor)
+        .style('transform', `translate(${x}px,${y}px)`)
+        .attr('points', '75,37.5 56.25,70 18.75,70 0,37.5 18.75,5 56.25,5' + ' ')
+        .attr('opacity', '0')
+        .transition()
+        .duration(1000)
+        .attr('opacity', '0.5');
+
+      this.splash.append('text')
+        .attr('x', x + 37.5)
+        .attr('y', y + 43)
+        .attr('font-family', 'Nexa, sans-serif')
+        .attr('text-anchor', 'middle')
+        .text(label)
+        .attr('opacity', '0')
+        .transition()
+        .duration(1000)
+        .attr('opacity', '0.5');
+    };
+
     this.splash = this.svg.append('g')
       .attr('id', 'splash')
       .attr('opacity', '1');
@@ -129,7 +153,11 @@ class Render {
     }, 5000);
 
     setTimeout(() => {
-      renderText('Sit back and enjoy');
+      renderText('The color indicates the program that was used');
+      addHexagon('Safari',    'blue',   this.width / 5 * 1 - 37.50, this.height / 1.5);
+      addHexagon('Atom',      'green',  this.width / 5 * 2 - 37.50, this.height / 1.5);
+      addHexagon('Terminal',  'grey',   this.width / 5 * 3 - 37.50, this.height / 1.5);
+      addHexagon('Chrome',    'yellow', this.width / 5 * 4 - 37.50, this.height / 1.5);
     }, 10000);
 
     setTimeout(() => {
