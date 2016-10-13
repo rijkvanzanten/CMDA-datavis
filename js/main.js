@@ -24,8 +24,6 @@ class Helper {
       Chrome: '#ffce42'
     };
 
-    console.log(programName);
-
     return colors[programName];
   }
 
@@ -88,9 +86,55 @@ class Render {
       .attr('opacity', '0.2')
       .attr('fill', 'white')
       .attr('font-size', '150px')
-      .attr('text-anchor', 'right')
       .attr('x', 10)
       .attr('y', this.height - 20);
+  }
+
+  static showSplash() {
+    const renderText = (str) => {
+      this.splash.append('text')
+        .text(str)
+        .style('text-anchor', 'middle')
+        .attr('font-size', '25px')
+        .attr('fill', 'white')
+        .attr('x', this.width / 2)
+        .attr('y', this.height / 2)
+        .attr('opacity', '0')
+      .transition()
+        .duration(1000)
+        .attr('opacity', '1')
+      .transition()
+        .delay(5000)
+        .duration(1000)
+        .attr('opacity', '0')
+      .remove();
+    };
+
+    this.splash = this.svg.append('g')
+      .attr('id', 'splash')
+      .attr('opacity', '1');
+
+    this.splash.append('rect')
+      .attr('width', this.width - 200)
+      .attr('height', this.height - 200)
+      .attr('x', 100)
+      .attr('y', 100)
+      .attr('fill', 'rgba(0, 0, 0, 0.5)');
+
+    renderText('Please use headphones for an optimal experience');
+
+    setTimeout(() => {
+      renderText('Use your mouse to progress through time');
+    }, 5000);
+
+    setTimeout(() => {
+      renderText('Sit back and enjoy');
+    }, 10000);
+
+    setTimeout(() => {
+      this.splash.transition().duration(1000).attr('opacity', '0').remove();
+      App.start();
+    }, 15000);
   }
 
   static updateDateShow(date) {
@@ -171,10 +215,9 @@ class Render {
     };
     this.svg.append('rect')
       .attr('id', 'background')
-      .attr('fill', 'blue')
       .attr('width', this.width)
       .attr('height', this.height)
-      .attr('fill', this.colors(1));
+      .attr('fill', '#9facb8');
   }
 
   static changeBackground(hours) {
@@ -325,7 +368,7 @@ class App {
     render();
   }
 
-  static start() {
+  static init() {
     Render.initSVG();
     Render.initBackground();
     Render.initDateShow();
@@ -344,14 +387,18 @@ class App {
         };
       });
       Render.setLineScales(this.keystrokes);
-      Render.appendLineGraph(this.keystrokes);
       Helper.setDataPointScale(Render.line, this.keystrokes);
       Render.svg.on('mousemove', this.onMouseMove.bind(this));
       Helper.setAudioLevelScale(this.keystrokes);
 
-      this.startRenderLoop();
+      Render.showSplash();
     });
+  }
+
+  static start() {
+    Render.appendLineGraph(this.keystrokes);
+    this.startRenderLoop();
   }
 }
 
-App.start();
+App.init();
