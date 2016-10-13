@@ -82,7 +82,7 @@ class Render {
   static initDateShow() {
     this.svg.append('text')
       .attr('id', 'datetime')
-      .attr('font-family', 'Helvetica Neue')
+      .attr('font-family', 'Nexa, sans-serif')
       .attr('opacity', '0.2')
       .attr('fill', 'white')
       .attr('font-size', '150px')
@@ -95,6 +95,7 @@ class Render {
       this.splash.append('text')
         .text(str)
         .style('text-anchor', 'middle')
+        .attr('font-family', 'Nexa, sans-serif')
         .attr('font-size', '25px')
         .attr('fill', 'white')
         .attr('x', this.width / 2)
@@ -133,7 +134,6 @@ class Render {
 
     setTimeout(() => {
       this.splash.transition().duration(1000).attr('opacity', '0').remove();
-      App.start();
     }, 15000);
   }
 
@@ -145,7 +145,7 @@ class Render {
 
       if(date.getHours() === 0) {
         this.svg.append('text')
-          .attr('font-family', 'Helvetica Neue')
+          .attr('font-family', 'Nexa, sans-serif')
           .attr('fill', 'white')
           .attr('font-size', '60px')
           .attr('text-anchor', 'middle')
@@ -364,7 +364,7 @@ class App {
     render();
   }
 
-  static init() {
+  static start() {
     Render.initSVG();
     Render.initBackground();
     Render.initDateShow();
@@ -387,14 +387,11 @@ class App {
       Render.svg.on('mousemove', this.onMouseMove.bind(this));
       Helper.setAudioLevelScale(this.keystrokes);
 
+      Render.appendLineGraph(this.keystrokes);
       Render.showSplash();
+      this.startRenderLoop();
     });
-  }
-
-  static start() {
-    Render.appendLineGraph(this.keystrokes);
-    this.startRenderLoop();
   }
 }
 
-App.init();
+App.start();
