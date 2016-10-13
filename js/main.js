@@ -87,7 +87,23 @@ class Render {
         .text(dateString);
 
       if(date.getHours() === 0) {
-        
+        this.svg.append('text')
+          .attr('font-family', 'Helvetica Neue')
+          .attr('fill', 'white')
+          .attr('font-size', '60px')
+          .attr('text-anchor', 'middle')
+          .attr('x', this.width / 2)
+          .attr('y', this.height / 4)
+          .text(`${date.getDate()}/${date.getMonth()}`)
+          .style('transform-origin', 'center center')
+          .style('opacity', '0')
+          .transition()
+          .duration(1000)
+          .style('opacity', '0.2')
+          .transition()
+          .delay(7500)
+          .style('opacity', '0')
+          .remove();
       }
 
       this.lastDate = date;
