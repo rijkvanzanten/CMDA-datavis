@@ -29,11 +29,11 @@ class Helper {
   static setDataPointScale(lineElement, keystrokes) {
     this.dataPointScale = d3.scale.linear()
       .range(d3.extent(keystrokes, (d) => d.keystrokes))
-      .domain([this.getHeight() / 5, 0]);
+      .domain([this.getHeight() / 2, 0]);
   }
 
   static getDataPoint(xPos) {
-    return + Math.round(this.dataPointScale(document.querySelector('#line').getPointAtLength(xPos).y));
+    return +Math.round(this.dataPointScale(document.querySelector('#line').getPointAtLength(xPos).y));
   }
 
   static getCurrentHour(keystrokes, xPos) {
@@ -96,7 +96,7 @@ class Render {
 
     this.lineYScale = d3.scale.linear()
       .domain([0, d3.max(keystrokes, (d) => d.keystrokes)])
-      .range([this.height / 5, 0]);
+      .range([this.height / 2, 0]);
   }
 
   static appendLineGraph(keystrokes) {
@@ -228,20 +228,20 @@ class AudioPlayer {
   }
 
   static changeAmbientAudio(date) {
-    if(date !== this.lastDate) {
-
-      if(date.getDate() === 3 && date.getHours() > 10 && date.getHours() < 16) {
-        if(this.lastAmbientSrc !== 'mp3/gamen.mp3') {
-          this.ambientAudio.src = 'mp3/gamen.mp3';
-          this.lastAmbientSrc = 'mp3/gamen.mp3';
-        }
-        this.ambientAudio.volume = 1;
-      } else {
-        this.ambientAudio.volume = 0;
-      }
-
-      this.lastDate = date;
-    }
+    // if(date !== this.lastDate) {
+    //
+    //   if(date.getDate() === 3 && date.getHours() > 10 && date.getHours() < 16) {
+    //     if(this.lastAmbientSrc !== 'mp3/gamen.mp3') {
+    //       this.ambientAudio.src = 'mp3/gamen.mp3';
+    //       this.lastAmbientSrc = 'mp3/gamen.mp3';
+    //     }
+    //     this.ambientAudio.volume = 1;
+    //   } else {
+    //     this.ambientAudio.volume = 0;
+    //   }
+    //
+    //   this.lastDate = date;
+    // }
   }
 
   static getVolume() {
@@ -258,7 +258,7 @@ class App {
   static onMouseMove() {
     const getDx = d3.scale.linear()
       .domain([0, Render.width])
-      .range([-15, 15]);
+      .range([-5, 5]);
 
     this.speed = Math.round(getDx(d3.event.pageX));
   }
@@ -268,7 +268,7 @@ class App {
 
     let then = Date.now();
 
-    const drawInterval = 1000 / 30;
+    const drawInterval = 1000 / 60;
 
     let lastVol = 0;
 
