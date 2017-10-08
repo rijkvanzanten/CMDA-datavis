@@ -5,6 +5,7 @@ define(['helper'], (Helper) => { // eslint-disable-line
       bgAudio.loop = true;
       bgAudio.autoplay = true;
       bgAudio.src = 'mp3/bg.mp3';
+      bgAudio.volume = 0.7;
 
       const audio = new Audio();
       audio.loop = true;
