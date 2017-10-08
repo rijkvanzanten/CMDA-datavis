@@ -16,7 +16,7 @@ require(['audio-handler', 'render-handler', 'helper'], (AudioHandler, RenderHand
     constructor(audio, render) {
       this.speed = 0;
 
-      d3.json('../data/data.json', (json) => {
+      d3.json('./data/data.json', (json) => {
         this.keystrokes = json.map((single) => {
           return {
             date: new Date(single.date),
