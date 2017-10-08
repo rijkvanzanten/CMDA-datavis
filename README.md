@@ -1,9 +1,13 @@
-# Data Visualisation
+# Data Visualization
 
-My visualisation of my keystrokes of the past two weeks or so.
+My visualization of my keystrokes of two weeks in October 2016.
 
-Uses D3 and the web audio api for the visualisations. Uses ES6 classes and RequireJS for easier code management.
+Uses D3 and the web audio api for the visualizations. Uses ES6 classes and RequireJS for easier code management.
 
-Expects a bg.mp3 file in the mp3 directory for the ambient music and a keyboard.mp3 file for the keyboard clicking effect. The files I used are a whopping 141MB, so I won't upload it to GitHub
+## Installation
+Clone this repo. It's all static HTML / CSS / JS so no further build step required.
 
-✌🏻
+## Usage
+Run this app with a http-server for RequireJS and D3 to be able to import files. I recommend using something like [`http-server`](https://npmjs.com/http-server).
+
+Note: this datavisualization doesn't play nicely with Safari, due to it's strict anti autoplay policies.
